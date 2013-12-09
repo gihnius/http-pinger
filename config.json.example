@@ -1,0 +1,12 @@
+{
+    "lag": 30,
+    "interval": 60,
+    "urls_file": "urls.txt",
+    "smtp_username": "",
+    "smtp_password": "",
+    "smtp_host": "localhost",
+    "smtp_port": "25",
+    "email_subject": "http pinger",
+    "from_email": "admin@server.com",
+    "to_emails": ["admingroup@server.com"]
+}
