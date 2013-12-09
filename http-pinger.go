@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"net/smtp"
 	"os"
@@ -35,7 +34,7 @@ func main() {
 	ParseConfig()
 	file_data, err := ioutil.ReadFile(Config.UrlsFile)
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 	var urls []string
 	for _, line := range strings.Split(string(file_data), "\n") {
@@ -46,7 +45,7 @@ func main() {
 	}
 
 	for _, url := range urls {
-		log.Println(url)
+		fmt.Println(url)
 		go ping(url)
 	}
 
