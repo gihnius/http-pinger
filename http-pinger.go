@@ -66,7 +66,6 @@ func ping(url string) {
 			EmailMsg(msg)
 			c <- msg
 		} else {
-			defer res.Body.Close()
 			lag := time.Since(start)
 			var msg string
 			if lag > time.Duration(Config.Lag)*time.Second {
@@ -75,6 +74,7 @@ func ping(url string) {
 			}
 			msg = "[OK " + strconv.Itoa(res.StatusCode) + "] "  + url + " responsed in " + lag.String()
 			c <- msg
+			res.Body.Close()
 		}
 		time.Sleep(time.Duration(Config.Interval) * time.Second)
 	}
