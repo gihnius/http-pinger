@@ -8,7 +8,6 @@ import (
 	"net/smtp"
 	"os"
 	"strings"
-	"strconv"
 	"time"
 )
 
@@ -28,6 +27,17 @@ type ConfigJson struct {
 	EmailSubject string   `json:"email_subject"`
 	FromEmail    string   `json:"from_email"`
 	ToEmails     []string `json:"to_emails"`
+}
+
+type Msg struct {
+	Server    string `json:"server_url"`
+	Type      string `json:"message_type"`
+	Date      string `json:"date"`
+	Lag       int    `json:"lag_threshold_in_second"`
+	Interval  int    `json:"check_interval_in_second"`
+	Status    int    `json:"http_status_code"`
+	Responsed string `json:"server_responsed_in"`
+	Error     string `json:"error"`
 }
 
 func main() {
@@ -51,7 +61,7 @@ func main() {
 
 	for {
 		select {
-		case msg := <- c:
+		case msg := <-c:
 			fmt.Println(msg)
 		}
 	}
@@ -61,19 +71,39 @@ func ping(url string) {
 	for {
 		start := time.Now()
 		res, err := http.Get(url)
+		msg := Msg{}
 		if err != nil {
-			msg := time.Now().Format("2006-01-02 15:04 -0700") + " [Fatal] " + url + " - " + err.Error()
-			EmailMsg(msg)
-			c <- msg
+			msg.Server = url
+			msg.Type = "Fatal"
+			msg.Date = time.Now().Format("2006-01-02 15:04 -0700")
+			msg.Lag = Config.Lag
+			msg.Interval = Config.Interval
+			msg.Status = -1
+			msg.Responsed = "NaN"
+			msg.Error = err.Error()
+			b, _ := json.Marshal(msg)
+			str := string(b)
+			EmailMsg(str)
+			c <- str
 		} else {
 			lag := time.Since(start)
-			var msg string
+			msg.Server = url
+			msg.Date = time.Now().Format("2006-01-02 15:04 -0700")
+			msg.Lag = Config.Lag
+			msg.Interval = Config.Interval
+			msg.Status = res.StatusCode
+			msg.Responsed = lag.String()
 			if lag > time.Duration(Config.Lag)*time.Second {
-				msg = time.Now().Format("2006-01-02 15:04 -0700") + " [Warning " + strconv.Itoa(res.StatusCode) + "] " + url + " responsed in " + lag.String()
-				EmailMsg(msg)
+				msg.Type = "Warning"
+				msg.Error = "Responsed times over lag threshold!"
+				b, _ := json.Marshal(msg)
+				str := string(b)
+				EmailMsg(str)
 			}
-			msg = "[OK " + strconv.Itoa(res.StatusCode) + "] "  + url + " responsed in " + lag.String()
-			c <- msg
+			msg.Type = "OK"
+			b, _ := json.Marshal(msg)
+			str := string(b)
+			c <- str
 			res.Body.Close()
 		}
 		time.Sleep(time.Duration(Config.Interval) * time.Second)
