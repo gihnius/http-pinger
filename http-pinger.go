@@ -93,6 +93,14 @@ func ping(url string) {
 			msg.Interval = Config.Interval
 			msg.Status = res.StatusCode
 			msg.Responsed = lag.String()
+			msg.Type = "OK" // expected
+			if res.StatusCode != 200 {
+				msg.Type = "Warning"
+				msg.Error = "Unexpected http status code!"
+				b, _ := json.Marshal(msg)
+				str := string(b)
+				EmailMsg(str)
+			}
 			if lag > time.Duration(Config.Lag)*time.Second {
 				msg.Type = "Warning"
 				msg.Error = "Responsed times over lag threshold!"
@@ -100,7 +108,6 @@ func ping(url string) {
 				str := string(b)
 				EmailMsg(str)
 			}
-			msg.Type = "OK"
 			b, _ := json.Marshal(msg)
 			str := string(b)
 			c <- str
