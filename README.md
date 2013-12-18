@@ -41,6 +41,12 @@ https://non-exist.xyz/
 ```
 lines without http:// or https:// beginning would be ignored.
 
+## TODO
+
+* monitor other services: smtp, ftp, ping, pop3, custom port...
+* check spectial expected http status code for a url
+* add notify by twitter, SMS ?
+
 
 ## License
 
