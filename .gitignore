@@ -1,6 +1,6 @@
 # System things
 .DS_Store
-hohup.out
+nohup.out
 
 # Project things
 config.json
