@@ -1,3 +1,8 @@
+# System things
+.DS_Store
+hohup.out
+
+# Project things
 config.json
 urls.txt
 http-pinger
