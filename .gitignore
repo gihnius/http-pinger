@@ -1,0 +1,8 @@
+# System things
+.DS_Store
+nohup.out
+
+# Project things
+config.json
+urls.txt
+http-pinger
